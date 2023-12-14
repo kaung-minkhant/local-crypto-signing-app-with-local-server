@@ -8,19 +8,18 @@ import { Login } from "./components/LoginLogout/Login";
 function App() {
   const [balance, setBalance] = useState(0);
   const [address, setAddress] = useState("");
-
+  console.log({address})
   return (
     <div className="app">
       <div className="row-container">
-        <Signup />
-        <Login />
+        <Signup setAddress={setAddress} />
+        <Login setAddress={setAddress} />
       </div>
       <div className="row-container">
         <Wallet
           balance={balance}
           setBalance={setBalance}
           address={address}
-          setAddress={setAddress}
         />
         <Transfer setBalance={setBalance} address={address} />
       </div>

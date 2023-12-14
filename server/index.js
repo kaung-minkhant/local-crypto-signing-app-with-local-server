@@ -7,15 +7,47 @@ app.use(cors());
 app.use(express.json());
 
 const balances = {
-  "0x1": 100,
-  "0x2": 50,
-  "0x3": 75,
 };
+
+const users = {}
+
+app.get('/', (req, res) => {
+  res.send('you ping, i pong')
+})
+
+app.post("/signup", (req, res) => {
+  const {email, password, publicKey, address} = req.body;
+  users[email] = {
+    email, password, publicKey, address
+  }
+  balances[address] = 100;
+  
+  console.log({users, balances})
+  res.status(200).send('ok')
+})
+
+app.post('/login', (req, res) => {
+  const {email, password} = req.body;
+  const user = users[email]
+  if (!user) {
+    return res.status(400).send({
+      errorMessage: 'User is not registerred',
+    })
+  }
+  if (password !== user.password) {
+    return res.status(401).send({
+      errorMessage: 'Email or Password is incorrect',
+    })
+  }
+  return res.status(200).send({
+    address: user.address
+  })
+})
 
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
   const balance = balances[address] || 0;
-  res.send({ balance });
+  res.status(200).send({ balance });
 });
 
 app.post("/send", (req, res) => {
@@ -29,7 +61,7 @@ app.post("/send", (req, res) => {
   } else {
     balances[sender] -= amount;
     balances[recipient] += amount;
-    res.send({ balance: balances[sender] });
+    res.status(200).send({ balance: balances[sender] });
   }
 });
 

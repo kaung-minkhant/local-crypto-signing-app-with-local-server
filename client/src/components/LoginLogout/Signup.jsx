@@ -1,22 +1,37 @@
 import { useState } from "react"
 import { generatePrivateKey, getSignedUpEmails, isSignedUpUser, storePrivateKeyInSuperSecureWay } from "../../utils"
-import {toast} from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
+import { apiEndPoints, errorMessages, toastSettings } from "../../settings"
+import server from "../../server"
+import axios from "axios"
 
-export const Signup = () => {
+export const Signup = ({setAddress}) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const handleSignUp = () => {
+    const handleSignUp = async () => {
+        if (!Boolean(email) || !Boolean(password)) {
+            toast.error(errorMessages.emptyEmailPassword(), {
+                duration: toastSettings.errorToastDuration
+            })
+            return;
+        }
         const emailList = getSignedUpEmails()
         if (!isSignedUpUser(email, emailList)) {
-            const { privateKey } = generatePrivateKey()
+            const { privateKey, address, publicKey } = generatePrivateKey()
             storePrivateKeyInSuperSecureWay(email, privateKey)
+            await server.post(apiEndPoints.signup, {
+                email, password, address, publicKey
+            })
+            console.log('address', address)
+            setAddress(address)
+            
         } else {
-            toast.error(<p>User with email <u>{email}</u> already exists</p>, {
-                duration: 2000,
+            toast.error(errorMessages.userExists(email), {
+                duration: toastSettings.errorToastDuration,
             })
         }
-        
+
     }
 
     const handleFormSubmit = (e) => {
@@ -36,7 +51,14 @@ export const Signup = () => {
                         onChange={e => setEmail(e.target.value)}
                         required />
                 </label>
-                <label htmlFor="signup-password">Password: <input id="signup-password" type="password" required /></label>
+                <label htmlFor="signup-password">
+                    Password: <input
+                        id="signup-password"
+                        type="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        required />
+                </label>
                 <button onClick={handleSignUp} className="button">Sign Up</button>
             </form>
         </div>

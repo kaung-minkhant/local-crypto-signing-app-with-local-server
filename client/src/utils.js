@@ -4,7 +4,7 @@ import {getRandomBytesSync} from 'ethereum-cryptography/random'
 import {toHex, utf8ToBytes} from 'ethereum-cryptography/utils'
 
 // variables
-import { keyRelatedVar, localStorageVar } from "./magicNumber"
+import { keyRelatedVar, localStorageVar } from "./settings"
 
 // crypto functions
 export const generatePrivateKey = () => {

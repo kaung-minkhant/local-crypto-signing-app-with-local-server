@@ -1,18 +1,16 @@
+import { useEffect, useLayoutEffect } from "react";
 import server from "./server";
 
-function Wallet({ address, setAddress, balance, setBalance }) {
-  async function onChange(evt) {
-    const address = evt.target.value;
-    setAddress(address);
-    if (address) {
-      const {
-        data: { balance },
-      } = await server.get(`balance/${address}`);
-      setBalance(balance);
-    } else {
-      setBalance(0);
-    }
+function Wallet({ address, balance, setBalance }) {
+  async function getBalance(address) {
+    const { data: {balance }} = await server.get(`balance/${address}`)
+    setBalance(balance)
   }
+  useEffect(() => {
+    if (address) {
+      getBalance(address)
+    }
+  }, [address])
 
   return (
     <div className="container wallet">
@@ -20,7 +18,7 @@ function Wallet({ address, setAddress, balance, setBalance }) {
 
       <label>
         Wallet Address
-        <input placeholder="Type an address, for example: 0x1" value={address} onChange={onChange}></input>
+        <input placeholder="Your wallet address" value={address} disabled></input>
       </label>
 
       <div className="balance">Balance: {balance}</div>
