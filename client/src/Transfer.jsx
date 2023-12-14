@@ -1,5 +1,8 @@
 import { useState } from "react";
 import server from "./server";
+import { conlog, generateSignature, getCurrentUser, getPrivateKey } from "./utils";
+import {toast} from 'react-hot-toast'
+import { errorMessages, toastSettings } from "./settings";
 
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
@@ -9,19 +12,34 @@ function Transfer({ address, setBalance }) {
 
   async function transfer(evt) {
     evt.preventDefault();
-
-    try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(sendAmount),
-        recipient,
-      });
-      setBalance(balance);
-    } catch (ex) {
-      alert(ex.response.data.message);
+    if (!Boolean(address)) {
+      toast.error(errorMessages.noUser(), {
+        duration: toastSettings.errorToastDuration,
+      })
+      return;
     }
+    const data = {
+      sender: address,
+      amount: parseInt(sendAmount),
+      recipient,
+    }
+    const dataString = JSON.stringify(data)
+    const currentUser = getCurrentUser();
+    const privateKey = getPrivateKey(currentUser)
+    const {signature} = generateSignature(dataString, privateKey)
+    conlog({signature})
+    // try {
+    //   const {
+    //     data: { balance },
+    //   } = await server.post(`send`, {
+    //     sender: address,
+    //     amount: parseInt(sendAmount),
+    //     recipient,
+    //   });
+    //   setBalance(balance);
+    // } catch (ex) {
+    //   alert(ex.response.data.message);
+    // }
   }
 
   return (

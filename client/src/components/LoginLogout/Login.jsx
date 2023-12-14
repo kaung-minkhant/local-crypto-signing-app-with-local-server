@@ -2,6 +2,7 @@ import { useState } from "react"
 import server from "../../server"
 import { apiEndPoints, errorMessages, toastSettings } from "../../settings"
 import toast from "react-hot-toast"
+import { setCurrentUser } from "../../utils"
 
 export const Login = ({setAddress}) => {
     const [email, setEmail] = useState('')
@@ -20,6 +21,7 @@ export const Login = ({setAddress}) => {
             return;
         }
         const address = await login();
+        setCurrentUser(email)
         setAddress(address)
     }
 

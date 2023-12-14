@@ -2,6 +2,7 @@ import React from "react"
 
 export const localStorageVar = {
     pubKeyItemName: 'pubKeys',
+    currentUserItemName: 'current',
 }
 
 export const keyRelatedVar = {
@@ -23,7 +24,12 @@ export const errorMessages = {
         return (
             <p>Empty email or password</p>
         )
-    }
+    },
+    noUser: function () {
+        return (
+            <p>Please login or sign up</p>
+        )
+    },
 }
 
 export const apiEndPoints = {

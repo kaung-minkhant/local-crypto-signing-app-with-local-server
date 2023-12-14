@@ -9,8 +9,7 @@ import { keyRelatedVar, localStorageVar } from "./settings"
 // crypto functions
 export const generatePrivateKey = () => {
     const addressLength = keyRelatedVar.addressLength;
-    const keyLength = keyRelatedVar.keyLength;
-    const privateKey = toHex(getRandomBytesSync(keyLength));
+    const privateKey = toHex(secp256k1.utils.randomPrivateKey())
     const publicKey =  toHex(secp256k1.getPublicKey(privateKey))
     const publicKeyBytes = utf8ToBytes(publicKey)
     const publicKeyHash = toHex(sha256(publicKeyBytes))
@@ -19,6 +18,14 @@ export const generatePrivateKey = () => {
     conlog({privateKey, publicKey, publicKeyHash, address})
     return {
         privateKey, publicKey, address
+    }
+}
+
+export const generateSignature = (msg, privateKey) => {
+    const msgHash = sha256(utf8ToBytes(msg));
+    const signature = secp256k1.sign(msgHash, privateKey);
+    return {
+        signature,
     }
 }
 
@@ -56,5 +63,25 @@ export const getSignedUpEmails = () => {
             return []
         }
         return Object.keys(existingData)
+    }
+}
+
+export const setCurrentUser = (email) => {
+    if (typeof Storage !== "undefined") {
+        localStorage.setItem(localStorageVar.currentUserItemName, email)
+    }
+}
+
+export const getCurrentUser = () => {
+    if (typeof Storage !== "undefined") {
+        const data = localStorage.getItem(localStorageVar.currentUserItemName);
+        return data ? data : null;
+    }
+}
+
+export const getPrivateKey = (email) => {
+    if (typeof Storage !== 'undefined') {
+        const data = JSON.parse(localStorage.getItem(localStorageVar.pubKeyItemName))
+        return data[email]
     }
 }
