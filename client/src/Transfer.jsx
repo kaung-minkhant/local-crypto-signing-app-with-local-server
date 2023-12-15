@@ -1,8 +1,8 @@
 import { useState } from "react";
 import server from "./server";
-import { conlog, generateSignature, getCurrentUser, getPrivateKey } from "./utils";
+import { BigIntObjectToStringObject, conlog, generateSignature, getCurrentUser, getPrivateKey } from "./utils";
 import {toast} from 'react-hot-toast'
-import { errorMessages, toastSettings } from "./settings";
+import { apiEndPoints, errorMessages, toastSettings } from "./settings";
 
 function Transfer({ address, setBalance }) {
   const [sendAmount, setSendAmount] = useState("");
@@ -27,7 +27,13 @@ function Transfer({ address, setBalance }) {
     const currentUser = getCurrentUser();
     const privateKey = getPrivateKey(currentUser)
     const {signature} = generateSignature(dataString, privateKey)
-    conlog({signature})
+    const formatedSignature = BigIntObjectToStringObject(signature)
+    conlog({signature, formatedSignature})
+
+    await server.post(apiEndPoints.transfer, {
+      message: data,
+      formatedSignature,
+    })
     // try {
     //   const {
     //     data: { balance },

@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = 3042;
+const {sha256} = require('ethereum-cryptography/sha256')
+const {utf8ToBytes} = require('ethereum-cryptography/utils');
+const { getPublicKeyFromSig, StringObjectToBigIntObject } = require("./utils");
 
 app.use(cors());
 app.use(express.json());
@@ -51,18 +54,24 @@ app.get("/balance/:address", (req, res) => {
 });
 
 app.post("/send", (req, res) => {
-  const { sender, recipient, amount } = req.body;
+  // const { sender, recipient, amount } = req.body;
+  const {message, formatedSignature} = req.body;
+  const messageHash = sha256(utf8ToBytes(JSON.stringify(message)))
+  const signature = StringObjectToBigIntObject(formatedSignature)
+  getPublicKeyFromSig(messageHash, signature)
 
-  setInitialBalance(sender);
-  setInitialBalance(recipient);
+  // setInitialBalance(sender);
+  // setInitialBalance(recipient);
 
-  if (balances[sender] < amount) {
-    res.status(400).send({ message: "Not enough funds!" });
-  } else {
-    balances[sender] -= amount;
-    balances[recipient] += amount;
-    res.status(200).send({ balance: balances[sender] });
-  }
+  // if (balances[sender] < amount) {
+  //   res.status(400).send({ message: "Not enough funds!" });
+  // } else {
+  //   balances[sender] -= amount;
+  //   balances[recipient] += amount;
+  //   res.status(200).send({ balance: balances[sender] });
+  // }
+  res.status(200).send('ok');
+
 });
 
 app.listen(port, () => {

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { generatePrivateKey, getSignedUpEmails, isSignedUpUser, storePrivateKeyInSuperSecureWay } from "../../utils"
+import { generatePrivateKey, getSignedUpEmails, isSignedUpUser, setCurrentUser, storePrivateKeyInSuperSecureWay } from "../../utils"
 import { toast } from 'react-hot-toast'
 import { apiEndPoints, errorMessages, toastSettings } from "../../settings"
 import server from "../../server"
@@ -24,6 +24,7 @@ export const Signup = ({setAddress}) => {
                 email, password, address, publicKey
             })
             console.log('address', address)
+            setCurrentUser(email)
             setAddress(address)
             
         } else {

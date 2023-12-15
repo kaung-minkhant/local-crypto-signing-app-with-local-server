@@ -34,5 +34,6 @@ export const errorMessages = {
 
 export const apiEndPoints = {
     login: 'login',
-    signup: 'signup'
+    signup: 'signup',
+    transfer: 'send',
 }

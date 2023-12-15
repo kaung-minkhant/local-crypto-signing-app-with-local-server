@@ -34,6 +34,18 @@ export const conlog = (msg, label="") => {
     console.log(label, msg)
 }
 
+export const BigIntObjectToStringObject = (bigIntObject) => {
+    const stringObject = {};
+    for (let key of Object.keys(bigIntObject)) {
+        if (typeof bigIntObject[key] === 'bigint') {
+            stringObject[key] = bigIntObject[key].toString()
+            continue;
+        }
+        stringObject[key] = bigIntObject[key]
+    }
+    return stringObject;
+}
+
 
 // checking and validation functions
 export const isSignedUpUser = (email, emailList) => {
