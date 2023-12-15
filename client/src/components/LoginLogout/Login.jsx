@@ -2,16 +2,26 @@ import { useState } from "react"
 import server from "../../server"
 import { apiEndPoints, errorMessages, toastSettings } from "../../settings"
 import toast from "react-hot-toast"
-import { setCurrentUser } from "../../utils"
+import { conlog, setCurrentUser } from "../../utils"
 
 export const Login = ({setAddress}) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const login = async () => {
-        const {data: {address}} = await server.post(apiEndPoints.login, {
-            email, password
-        })
-        return address
+        try{
+            const {data: {address}} = await server.post(apiEndPoints.login, {
+                email, password
+            })
+            setCurrentUser(email)
+            setAddress(address)
+        } catch (error) {
+            conlog(error, 'api error in login')
+            toast.error(errorMessages.apiError(error.response.data.errorMessage), {
+                duration: toastSettings.errorToastDuration
+            })
+           
+        }
+       
     }
     const handleLogin = async () => {
         if (!Boolean(email) || !Boolean(password)) {
@@ -20,9 +30,8 @@ export const Login = ({setAddress}) => {
             })
             return;
         }
-        const address = await login();
-        setCurrentUser(email)
-        setAddress(address)
+        await login();
+        
     }
 
     const handleSubmit = (e) => {

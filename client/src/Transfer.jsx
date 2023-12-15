@@ -1,6 +1,6 @@
 import { useState } from "react";
 import server from "./server";
-import { BigIntObjectToStringObject, conlog, generateSignature, getCurrentUser, getPrivateKey } from "./utils";
+import { conlog, generateSignatureCompact, getCurrentUser, getPrivateKey } from "./utils";
 import {toast} from 'react-hot-toast'
 import { apiEndPoints, errorMessages, toastSettings } from "./settings";
 
@@ -26,26 +26,22 @@ function Transfer({ address, setBalance }) {
     const dataString = JSON.stringify(data)
     const currentUser = getCurrentUser();
     const privateKey = getPrivateKey(currentUser)
-    const {signature} = generateSignature(dataString, privateKey)
-    const formatedSignature = BigIntObjectToStringObject(signature)
-    conlog({signature, formatedSignature})
-
-    await server.post(apiEndPoints.transfer, {
-      message: data,
-      formatedSignature,
-    })
-    // try {
-    //   const {
-    //     data: { balance },
-    //   } = await server.post(`send`, {
-    //     sender: address,
-    //     amount: parseInt(sendAmount),
-    //     recipient,
-    //   });
-    //   setBalance(balance);
-    // } catch (ex) {
-    //   alert(ex.response.data.message);
-    // }
+    const {signatureCompact, recovery} = generateSignatureCompact(dataString, privateKey)
+    
+    try {
+      const {data: {balance}} = await server.post(apiEndPoints.transfer, {
+        message: data,
+        signatureCompact,
+        recovery,
+      })
+      setBalance(balance)
+    } catch (error) {
+      conlog(error, 'api error in transfer')
+      toast.error(errorMessages.apiError(error.response.data.errorMessage), {
+        duration: toastSettings.errorToastDuration
+      })
+    }
+    
   }
 
   return (

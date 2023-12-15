@@ -1,10 +1,20 @@
-const secp = require('ethereum-cryptography/secp256k1')
+const {secp256k1} = require('ethereum-cryptography/secp256k1')
+const {toHex, utf8ToBytes} = require('ethereum-cryptography/utils')
+const {sha256} = require('ethereum-cryptography/sha256')
+const { keyRelatedVar } = require('./settings')
 
 // cryptography functions
-const getPublicKeyFromSig = (msgHash, signature) =>  {
-    secp.recoverPublicKey()
-    // const publicKey = signature.recoverPublicKey(msgHash).toRawBytes()
-    // console.log({publicKey})
+const getPublicKeyFromSignatureCompact = (msgHash, signatureCompact, recovery) =>  {
+    let signature = secp256k1.Signature.fromCompact(signatureCompact)
+    signature = signature.addRecoveryBit(recovery)
+    const publicKey = toHex(signature.recoverPublicKey(msgHash).toRawBytes())
+    return publicKey
+}
+
+const getAddressFromPublicKey = (publicKey) => {
+    const keyHash = toHex(sha256(utf8ToBytes(publicKey)));
+    const address = keyHash.substring(keyHash.length-1-keyRelatedVar.addressLength)
+    return address
 }
 
 
@@ -26,6 +36,7 @@ const StringObjectToBigIntObject = (stringObject) => {
 
 
 module.exports = {
-    getPublicKeyFromSig,
-    StringObjectToBigIntObject
+    getPublicKeyFromSignatureCompact,
+    StringObjectToBigIntObject,
+    getAddressFromPublicKey
 }

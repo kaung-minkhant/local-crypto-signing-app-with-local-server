@@ -30,6 +30,11 @@ export const errorMessages = {
             <p>Please login or sign up</p>
         )
     },
+    apiError: function(message) {
+        return (
+            <p>{message}</p>
+        )
+    }
 }
 
 export const apiEndPoints = {

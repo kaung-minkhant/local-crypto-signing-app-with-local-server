@@ -21,11 +21,13 @@ export const generatePrivateKey = () => {
     }
 }
 
-export const generateSignature = (msg, privateKey) => {
+export const generateSignatureCompact = (msg, privateKey) => {
     const msgHash = sha256(utf8ToBytes(msg));
     const signature = secp256k1.sign(msgHash, privateKey);
+    const signatureCompact = signature.toCompactHex();
     return {
-        signature,
+        signatureCompact,
+        recovery: signature.recovery
     }
 }
 
